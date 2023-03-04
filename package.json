@@ -1,0 +1,1006 @@
+{
+    "name": "liztochekcode",
+    "displayName": "LiztochekCode",
+    "version": "1.0.0",
+    "description": "Discrod RPC by LiztochekCode",
+    "main": "dist/extension.js",
+    "repository": "github:Liztochekcode/liztochekcodee",
+    "publisher": "Liztochekcode",
+    "contributors": [
+        "liztochekcode <liztochekcode@gmail.com>"
+    ],
+    "license": "MIT",
+    "private": true,
+    "icon": "assets/icon.png",
+    "bugs": {
+        "url": "https://github.com/Liztochekcode/liztochekcodee/issues"
+    },
+    "homepage": "https://github.com/Liztochekcode/liztochekcodee#readme",
+    "keywords": [
+        "discord",
+        "rich",
+        "presence",
+        "rich presence",
+        "rpc"
+    ],
+    "categories": [
+        "Visualization",
+        "Other"
+    ],
+    "extensionKind": [
+        "ui",
+        "workspace"
+    ],
+    "galleryBanner": {
+        "color": "#5865F2",
+        "theme": "dark"
+    },
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "scripts": {
+        "vscode:prepublish": "pnpm run package",
+        "package": "tsup",
+        "watch": "tsup --watch"
+    },
+    "devDependencies": {
+        "@types/git-url-parse": "^9.0.1",
+        "@types/node": "16.x",
+        "@types/vscode": "1.57.0",
+        "@xhayper/discord-rpc": "^1.0.15",
+        "discord-api-types": "^0.37.34",
+        "filesize": "^10.0.6",
+        "git-url-parse": "^13.1.0",
+        "source-map-support": "^0.5.21",
+        "tsup": "^6.6.3",
+        "typescript": "^4.9.5"
+    },
+    "engines": {
+        "vscode": "^1.57.0"
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "liztochekcode.enable",
+                "title": "Enable Discord Presence",
+                "category": "liztochekcode"
+            },
+            {
+                "command": "liztochekcode.disable",
+                "title": "Disable Discord Presence",
+                "category": "liztochekcode"
+            },
+            {
+                "command": "liztochekcode.workspace.enable",
+                "title": "Enable Discord Presence in the current workspace",
+                "category": "liztochekcode"
+            },
+            {
+                "command": "liztochekcode.workspace.disable",
+                "title": "Disable Discord Presence in the current workspace",
+                "category": "liztochekcode"
+            },
+            {
+                "command": "liztochekcode.disconnect",
+                "title": "Disconnect from Discord Gateway",
+                "category": "liztochekcode"
+            },
+            {
+                "command": "liztochekcode.reconnect",
+                "title": "Reconnect to Discord Gateway",
+                "category": "liztochekcode"
+            }
+        ],
+        "configuration": [
+            {
+                "title": "Extension",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Is the extension enabled?",
+                        "order": 0
+                    },
+                    "liztochekcode.app.name": {
+                        "type": "string",
+                        "enum": [
+                            "Code",
+                            "Visual Studio Code",
+                            "VSCodium",
+                            "Custom"
+                        ],
+                        "default": "Code",
+                        "description": "Choose the name you want the application to use.\nChoosing \"Custom\" will make it so it use the \"rpc.id\" as application id",
+                        "order": 1
+                    },
+                    "liztochekcode.app.id": {
+                        "type": "string",
+                        "default": "1077918425101377598",
+                        "description": "Application id that will be used when `appName` is \"Custom\" or when `appName` is invalid",
+                        "order": 2
+                    },
+                    "liztochekcode.app.whitelistEnabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Is the whitelist enabled?",
+                        "order": 3
+                    },
+                    "liztochekcode.app.whitelistIsBlacklist": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Switches the whitelist to a blacklist.",
+                        "order": 4
+                    },
+                    "liztochekcode.app.whitelist": {
+                        "type": "array",
+                        "default": [],
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of discord user ids that will be able to use the extension.",
+                        "order": 5
+                    }
+                }
+            },
+            {
+                "title": "Status",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.status.showElapsedTime": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should elapsed time be shown?"
+                    },
+                    "liztochekcode.status.resetElapsedTimePerFile": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should we reset the elapsed time after switching file?"
+                    },
+                    "liztochekcode.status.problems.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should we count the problems?"
+                    },
+                    "liztochekcode.status.problems.text": {
+                        "type": "string",
+                        "default": "- {problems_count} problems found",
+                        "description": "This text will be shown when there is a problem."
+                    },
+                    "liztochekcode.status.problems.countedSeverities": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "error",
+                                "warning",
+                                "info",
+                                "hint"
+                            ]
+                        },
+                        "default": [
+                            "error",
+                            "warning"
+                        ],
+                        "description": "List of problem level to count for `problems_count`."
+                    },
+                    "liztochekcode.status.idle.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should we enable the idle status?"
+                    },
+                    "liztochekcode.status.idle.check": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should we check when you are idling?"
+                    },
+                    "liztochekcode.status.idle.disconnectOnIdle": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should going idle disconnect you from discord gateway?."
+                    },
+                    "liztochekcode.status.idle.resetElapsedTime": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should going idle reset the elapsed time?."
+                    },
+                    "liztochekcode.status.idle.timeout": {
+                        "type": "number",
+                        "default": 300,
+                        "description": "Time in seconds before the user is considered idle."
+                    }
+                }
+            },
+            {
+                "title": "Ignore",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.ignore.workspaces": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "A list of workspace (name / path) to ignore."
+                    },
+                    "liztochekcode.ignore.workspacesText": {
+                        "type": [
+                            "string",
+                            "object"
+                        ],
+                        "description": "The text / object to show in the status when current workspace is ignored, when using the object, key is workspace name and value is the text."
+                    },
+                    "liztochekcode.ignore.repositories": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "A list of repository name to ignore."
+                    },
+                    "liztochekcode.ignore.organizations": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "A list of git organizations to ignore."
+                    },
+                    "liztochekcode.ignore.gitHosts": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "A list of git host to ignore."
+                    }
+                }
+            },
+            {
+                "title": "Details",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.status.details.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should details be shown?"
+                    },
+                    "liztochekcode.status.details.idle.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should details be shown when idling?"
+                    },
+                    "liztochekcode.status.details.text.idle": {
+                        "type": "string",
+                        "default": "Idling",
+                        "description": "The text to show when idling."
+                    },
+                    "liztochekcode.status.details.text.editing": {
+                        "type": "string",
+                        "default": "In {workspace} {problems}",
+                        "description": "The text to show when editing a file."
+                    },
+                    "liztochekcode.status.details.text.debugging": {
+                        "type": "string",
+                        "default": "Debugging {file_name}{file_extension}",
+                        "description": "The text to show when debugging."
+                    },
+                    "liztochekcode.status.details.text.viewing": {
+                        "type": "string",
+                        "default": "In {workspace} {problems}",
+                        "description": "The text to show when viewing a file."
+                    },
+                    "liztochekcode.status.details.text.notInFile": {
+                        "type": "string",
+                        "default": "Not in a file!",
+                        "description": "The text to show when you are not in a file."
+                    },
+                    "liztochekcode.status.details.text.noWorkSpaceText": {
+                        "type": "string",
+                        "default": "no workspace",
+                        "description": "The text to show when you are not in a workspace and there is no workspace text."
+                    }
+                }
+            },
+            {
+                "title": "State",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.status.state.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should state be shown?"
+                    },
+                    "liztochekcode.status.state.idle.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should state be shown when idling?"
+                    },
+                    "liztochekcode.status.state.text.idle": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The text to show when idling."
+                    },
+                    "liztochekcode.status.state.text.editing": {
+                        "type": "string",
+                        "default": "Working on {file_name}{file_extension}:{current_line}:{current_column}",
+                        "description": "The text to show when editting a file."
+                    },
+                    "liztochekcode.status.state.text.debugging": {
+                        "type": "string",
+                        "default": "Debugging: {workspace}",
+                        "description": "The text to show when debugging."
+                    },
+                    "liztochekcode.status.state.text.viewing": {
+                        "type": "string",
+                        "default": "Viewing {file_name}{file_extension}",
+                        "description": "The text to show when viewing a file."
+                    },
+                    "liztochekcode.status.state.text.notInFile": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The text to show when you are not in a file."
+                    },
+                    "liztochekcode.status.state.text.noWorkspaceFound": {
+                        "type": "string",
+                        "default": "No workspace.",
+                        "description": "The text to show when no workspace is found."
+                    }
+                }
+            },
+            {
+                "title": "Image",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.status.image.large.idle.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/idle-{app_id}.png",
+                        "description": "The image url to use when idling"
+                    },
+                    "liztochekcode.status.image.large.idle.text": {
+                        "type": "string",
+                        "default": "Idling",
+                        "description": "The large text to show when idling."
+                    },
+                    "liztochekcode.status.image.large.viewing.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/{lang}.png",
+                        "description": "The image url to use when viewing a file."
+                    },
+                    "liztochekcode.status.image.large.viewing.text": {
+                        "type": "string",
+                        "default": "Viewing a {LANG} file",
+                        "description": "The large text to show when viewing a file."
+                    },
+                    "liztochekcode.status.image.large.editing.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/{lang}.png",
+                        "description": "The image url to use when editing a file."
+                    },
+                    "liztochekcode.status.image.large.editing.text": {
+                        "type": "string",
+                        "default": "Editing a {LANG} file",
+                        "description": "The large text to show when editing a file."
+                    },
+                    "liztochekcode.status.image.large.debugging.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/debugging.png",
+                        "description": "The image url to use when debugging."
+                    },
+                    "liztochekcode.status.image.large.debugging.text": {
+                        "type": "string",
+                        "default": "Debugging a {LANG} file",
+                        "description": "The large text to show when debugging"
+                    },
+                    "liztochekcode.status.image.large.notInFile.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/idle-{app_id}.png",
+                        "description": "The image url to use when you are not in a file."
+                    },
+                    "liztochekcode.status.image.large.notInFile.text": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The lage text to show when you are not in a file."
+                    },
+                    "liztochekcode.status.image.small.idle.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/idle.png",
+                        "description": "The image url to use when idling."
+                    },
+                    "liztochekcode.status.image.small.idle.text": {
+                        "type": "string",
+                        "default": "zZz",
+                        "description": "The small text to show when idling."
+                    },
+                    "liztochekcode.status.image.small.viewing.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/{app_id}.png",
+                        "description": "The image url to use when viewing a file."
+                    },
+                    "liztochekcode.status.image.small.viewing.text": {
+                        "type": "string",
+                        "default": "{app_name}",
+                        "description": "The small text to show when viewing a file."
+                    },
+                    "liztochekcode.status.image.small.editing.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/{app_id}.png",
+                        "description": "The image url to use when editting a file."
+                    },
+                    "liztochekcode.status.image.small.editing.text": {
+                        "type": "string",
+                        "default": "{app_name}",
+                        "description": "The small text to show when editting a file."
+                    },
+                    "liztochekcode.status.image.small.debugging.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/debugging.png",
+                        "description": "The image url to use when debugging."
+                    },
+                    "liztochekcode.status.image.small.debugging.text": {
+                        "type": "string",
+                        "default": "{app_name}",
+                        "description": "The small text to show when debugging."
+                    },
+                    "liztochekcode.status.image.small.notInFile.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/LiztochekCode/liztochekcodee/main/assets/icons/idle.png",
+                        "description": "The image url to use when you are not in a file."
+                    },
+                    "liztochekcode.status.image.small.notInFile.text": {
+                        "type": "string",
+                        "default": "Snoozin...",
+                        "description": "The small text to show when you are not in a file."
+                    }
+                }
+            },
+            {
+                "title": "Buttons",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.status.buttons.button1.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should the button1 be shown?",
+                        "order": 0
+                    },
+                    "liztochekcode.status.buttons.button1.active.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button1 be shown when active?",
+                        "order": 1
+                    },
+                    "liztochekcode.status.buttons.button1.active.label": {
+                        "type": "string",
+                        "default": "Active Label Button 1",
+                        "description": "The label to use when button1 is active.",
+                        "order": 2
+                    },
+                    "liztochekcode.status.buttons.button1.active.url": {
+                        "type": "string",
+                        "default": "https://github.com/LiztochekCode/liztochekcodee/",
+                        "description": "The button1 url to use when active.",
+                        "order": 3
+                    },
+                    "liztochekcode.status.buttons.button1.git.active.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should the button1 be shown when active?",
+                        "order": 4
+                    },
+                    "liztochekcode.status.buttons.button1.git.active.label": {
+                        "type": "string",
+                        "default": "View Repository",
+                        "description": "The label to use when button1 is active.",
+                        "order": 5
+                    },
+                    "liztochekcode.status.buttons.button1.git.active.url": {
+                        "type": "string",
+                        "default": "{git_url}",
+                        "description": "The button1 url to use when active.",
+                        "order": 6
+                    },
+                    "liztochekcode.status.buttons.button1.git.idle.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should the button1 be shown when active?",
+                        "order": 4
+                    },
+                    "liztochekcode.status.buttons.button1.git.idle.label": {
+                        "type": "string",
+                        "default": "View Repository",
+                        "description": "The label to use when button1 is active.",
+                        "order": 8
+                    },
+                    "liztochekcode.status.buttons.button1.git.idle.url": {
+                        "type": "string",
+                        "default": "{git_url}",
+                        "description": "The button1 url to use when active.",
+                        "order": 9
+                    },
+                    "liztochekcode.status.buttons.button1.idle.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button1 be shown when idle?",
+                        "order": 10
+                    },
+                    "liztochekcode.status.buttons.button1.idle.label": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The label to use when button1 is idle.",
+                        "order": 11
+                    },
+                    "liztochekcode.status.buttons.button1.idle.url": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The button1 url to use idle.",
+                        "order": 12
+                    },
+                    "liztochekcode.status.buttons.button1.inactive.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button1 be shown when inactive?",
+                        "order": 13
+                    },
+                    "liztochekcode.status.buttons.button1.inactive.label": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The label to show when button1 is inactive.",
+                        "order": 14
+                    },
+                    "liztochekcode.status.buttons.button1.inactive.url": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The button1 url to use when inactive.",
+                        "order": 15
+                    },
+                    "liztochekcode.status.buttons.button2.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button2 be shown?",
+                        "order": 16
+                    },
+                    "liztochekcode.status.buttons.button2.active.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button2 be shown when active?",
+                        "order": 17
+                    },
+                    "liztochekcode.status.buttons.button2.active.label": {
+                        "type": "string",
+                        "default": "Active Label Button 2",
+                        "description": "The label to use when button2 is active.",
+                        "order": 18
+                    },
+                    "liztochekcode.status.buttons.button2.active.url": {
+                        "type": "string",
+                        "default": "https://github.com/LiztochekCode/liztochekcodee/",
+                        "description": "The button2 url to use when active.",
+                        "order": 19
+                    },
+                    "liztochekcode.status.buttons.button2.git.active.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should the button2 be shown when active?",
+                        "order": 20
+                    },
+                    "liztochekcode.status.buttons.button2.git.active.label": {
+                        "type": "string",
+                        "default": "View Repository",
+                        "description": "The label to use when button2 is active.",
+                        "order": 21
+                    },
+                    "liztochekcode.status.buttons.button2.git.active.url": {
+                        "type": "string",
+                        "default": "{git_url}",
+                        "description": "The button2 url to use when active.",
+                        "order": 22
+                    },
+                    "liztochekcode.status.buttons.button2.git.idle.enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Should the button2 be shown when active?",
+                        "order": 23
+                    },
+                    "liztochekcode.status.buttons.button2.git.idle.label": {
+                        "type": "string",
+                        "default": "View Repository",
+                        "description": "The label to use when button2 is active.",
+                        "order": 24
+                    },
+                    "liztochekcode.status.buttons.button2.git.idle.url": {
+                        "type": "string",
+                        "default": "{git_url}",
+                        "description": "The button2 url to use when active.",
+                        "order": 25
+                    },
+                    "liztochekcode.status.buttons.button2.idle.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button2 be shown when idle?",
+                        "order": 26
+                    },
+                    "liztochekcode.status.buttons.button2.idle.label": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The label to use when button2 is idle.",
+                        "order": 27
+                    },
+                    "liztochekcode.status.buttons.button2.idle.url": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The button2 url to use idle.",
+                        "order": 28
+                    },
+                    "liztochekcode.status.buttons.button2.inactive.enabled": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Should the button2 be shown when inactive?",
+                        "order": 29
+                    },
+                    "liztochekcode.status.buttons.button2.inactive.label": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The label to show when inactive.",
+                        "order": 30
+                    },
+                    "liztochekcode.status.buttons.button2.inactive.url": {
+                        "type": "string",
+                        "default": "",
+                        "description": "The button2 url to use when inactive.",
+                        "order": 31
+                    }
+                }
+            },
+            {
+                "title": "Misc",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.file.size.round": {
+                        "type": "number",
+                        "default": 2,
+                        "description": "The number of decimal places to round the file size to."
+                    },
+                    "liztochekcode.file.size.spacer": {
+                        "type": "string",
+                        "default": " ",
+                        "description": "Spacer between the number and the unit."
+                    },
+                    "liztochekcode.behaviour.additionalFileMapping": {
+                        "type": "object",
+                        "default": {},
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "description": "Additional regex to check for language, key is regex and value is the language."
+                    },
+                    "liztochekcode.behaviour.suppressNotifications": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Suppresses all notifications from the extension."
+                    },
+                    "liztochekcode.behavoiur.prioritizeLanguagesOverExtensions": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Prioritize language defined by editor over file extension when determining the language for the file."
+                    },
+                    "liztochekcode.file.size.humanReadable": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "If true, the file size will be displayed in a human readable format (e.g. 1.2 MB). If false, the file size will be displayed in bytes."
+                    },
+                    "liztochekcode.file.size.standard": {
+                        "type": "string",
+                        "enum": [
+                            "iec",
+                            "jedec"
+                        ],
+                        "default": "iec",
+                        "description": "The unit standard to use when displaying the file size."
+                    }
+                }
+            },
+            {
+                "title": "Advanced",
+                "type": "object",
+                "properties": {
+                    "liztochekcode.behaviour.debug": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Enable debug mode"
+                    }
+                }
+            },
+            {
+                "title": "@Deprecated",
+                "type": "object",
+                "properties": {
+                    "rpc.id": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.app.id#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.app.id instead."
+                    },
+                    "rpc.appName": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.app.name#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.app.name instead."
+                    },
+                    "rpc.enabled": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.enabled instead."
+                    },
+                    "rpc.detailsEditing": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details.text.editing#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details.text.editing instead."
+                    },
+                    "rpc.detailsIdling": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details.text.idle#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details.text.idle instead."
+                    },
+                    "rpc.detailsDebugging": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details.text.debugging#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details.text.debugging instead."
+                    },
+                    "rpc.detailsViewing": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details.text.viewing#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details.text.viewing instead."
+                    },
+                    "rpc.lowerDetailsEditing": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.state.text.editing#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.state.text.editing instead."
+                    },
+                    "rpc.lowerDetailsIdling": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.state.text.idle#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.state.text.idle instead."
+                    },
+                    "rpc.lowerDetailsDebugging": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.state.text.debugging#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.state.text.debugging instead."
+                    },
+                    "rpc.lowerDetailsViewing": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.state.text.viewing#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.state.text.viewing instead."
+                    },
+                    "rpc.lowerDetailsNoWorkspaceFound": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.state.text.noWorkspaceFound#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.state.text.noWorkspaceFound instead."
+                    },
+                    "rpc.baseImageLink": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.image#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.image instead."
+                    },
+                    "rpc.largeImage": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.image#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.image instead."
+                    },
+                    "rpc.largeImageIdling": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.image.small.idle.key#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.image.small.idle.key instead."
+                    },
+                    "rpc.smallImage": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.image.small#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.image.small instead."
+                    },
+                    "rpc.removeElapsedTime": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.showElapsedTime#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.showElapsedTime instead."
+                    },
+                    "rpc.removeDetails": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details.enabled instead."
+                    },
+                    "rpc.removeLowerDetails": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details instead."
+                    },
+                    "rpc.removeLowerDetailsIdling": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.details.text.idle#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.details.text.idle instead."
+                    },
+                    "rpc.showProblems": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.problems.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.problems.enabled instead."
+                    },
+                    "rpc.problemsText": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.problems.text#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.problems.text instead."
+                    },
+                    "rpc.ignoreWorkspaces": {
+                        "type": "array",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.ignore.workspaces#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.ignore.workspaces instead."
+                    },
+                    "rpc.ignoreWorkspacesText": {
+                        "type": [
+                            "string",
+                            "object"
+                        ],
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.ignore.workspacesText#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.ignore.workspacesText instead."
+                    },
+                    "rpc.checkIdle": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.idle.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.idle.enabled instead."
+                    },
+                    "rpc.disconnectOnIdle": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.idle.disconnectOnIdle#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.idle.disconnectOnIdle instead."
+                    },
+                    "rpc.resetElapsedTimeAfterIdle": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.idle.resetElapsedTime#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.idle.resetElapsedTime instead."
+                    },
+                    "rpc.idleTimeout": {
+                        "type": "number",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.idle.timeout#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.idle.timeout instead."
+                    },
+                    "rpc.idleText": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.image.small.idle.text#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.image.small.idle.text instead."
+                    },
+                    "rpc.buttonEnabled": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.enabled instead."
+                    },
+                    "rpc.buttonActiveLabel": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.button.active.label#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.button.active.label instead."
+                    },
+                    "liztochekcode.status.button.active.enabled": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.git.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.git.label instead."
+                    },
+                    "liztochekcode.status.button.active.label": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.git.label#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.git.label instead."
+                    },
+                    "liztochekcode.status.button.active.url": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.git.url#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.git.url instead."
+                    },
+                    "liztochekcode.status.button.idle.enabled": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.idle.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.idle.label instead."
+                    },
+                    "liztochekcode.status.button.idle.label": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.idle.label#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.idle.label instead."
+                    },
+                    "liztochekcode.status.button.idle.url": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.idle.url#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.idle.url instead."
+                    },
+                    "liztochekcode.status.button.inactive.enabled": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.inactive.enabled#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.inactive.label instead."
+                    },
+                    "liztochekcode.status.button.inactive.label": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.inactive.label#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.inactive.label instead."
+                    },
+                    "liztochekcode.status.button.inactive.url": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.buttons.button1.inactive.url#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.buttons.button1.inactive.url instead."
+                    },
+                    "rpc.buttonActiveUrl": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.button.active.url#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.button.active.url instead."
+                    },
+                    "rpc.buttonInactiveLabel": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.button.inactive.label#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.button.inactive.label instead."
+                    },
+                    "rpc.buttonInactiveUrl": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.status.button.inactive.url#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.status.button.inactive.url instead."
+                    },
+                    "rpc.ignoreRepositories": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.ignore.repositories#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.ignore.repositories instead."
+                    },
+                    "rpc.ignoreOrganizations": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.ignore.organizations#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.ignore.organizations instead."
+                    },
+                    "rpc.ignoreGitHosts": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.ignore.gitHosts#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.ignore.gitHosts instead."
+                    },
+                    "rpc.suppressNotifications": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.behaviour.suppressNotifications#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.behaviour.suppressNotifications instead."
+                    },
+                    "rpc.prioritizeLanguagesOverExtensions": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.behaviour.prioritizeLanguagesOverExtensions#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.behaviour.prioritizeLanguagesOverExtensions instead."
+                    },
+                    "rpc.fileSizeHumanReadable": {
+                        "type": "boolean",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.behaviour.size.humanReadable#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.behaviour.size.humanReadable instead."
+                    },
+                    "rpc.fileSizeSpec": {
+                        "type": "string",
+                        "enum": [
+                            "si",
+                            "iec",
+                            "jedec"
+                        ],
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.file.size.standard#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.file.size.standard instead."
+                    },
+                    "rpc.fileSizeFixed": {
+                        "type": "number",
+                        "markdownDeprecationMessage": "**Deprecated**",
+                        "deprecationMessage": "Deprecated"
+                    },
+                    "rpc.fileSizeSpacer": {
+                        "type": "string",
+                        "markdownDeprecationMessage": "**Deprecated**: Please use `#liztochekcode.file.size.spacer#` instead.",
+                        "deprecationMessage": "Deprecated: Please use liztochekcode.file.size.spacer instead."
+                    }
+                }
+            }
+        ]
+    },
+    "packageManager": "pnpm@7.27.0"
+}

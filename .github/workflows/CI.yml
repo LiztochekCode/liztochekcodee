@@ -1,0 +1,35 @@
+name: Continuous Integration
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 19
+        uses: actions/setup-node@v3
+        with:
+          node-version: 19
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build
+        run: |
+          pnpm install -D vsce
+          pnpm dlx vsce package --no-yarn
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ubuntu-latest
+          path: liztochekcode-*.vsix
